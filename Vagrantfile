@@ -29,9 +29,8 @@ Vagrant.configure("2") do |config|
 	end
 
 	# 3 identical test VMs
-	for i in 1..3
+	(1..3).each do |i|
 		config.vm.define :"ceph#{i}", autostart: false do |config|
-			server_id = i
 			config.vm.box = 'c33s/empty'
 			config.vm.box_version = '=0.1.0'
 			config.vm.provider :virtualbox do |vb|
@@ -76,9 +75,9 @@ Vagrant.configure("2") do |config|
 				# disk 1: mon (1 GB)
 				# disk 2: journal (1 GB)
 				# disk 3: osd (8 GB)
-				add_disk(vb, "./ceph#{server_id}-disk1.vdi", 0, 1024, 'on')
-				add_disk(vb, "./ceph#{server_id}-disk2.vdi", 1, 1024, 'on')
-				add_disk(vb, "./ceph#{server_id}-disk3.vdi", 2, 8192, 'off')
+				add_disk(vb, "./ceph#{i}-disk1.vdi", 0, 1024, 'on')
+				add_disk(vb, "./ceph#{i}-disk2.vdi", 1, 1024, 'on')
+				add_disk(vb, "./ceph#{i}-disk3.vdi", 2, 8192, 'off')
 			end
 		end
 	end
