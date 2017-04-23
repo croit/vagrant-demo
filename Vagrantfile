@@ -14,22 +14,29 @@ Vagrant.configure("2") do |config|
 			vb.memory = '1536'
 			vb.cpus = '4' # makes the initial setup much faster
 		end
-		config.vm.provision "shell", inline: <<-SHELL
-			sudo yum install -y yum-utils centos-release-ceph-jewel
-			sudo yum install -y ceph
-			sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-			sudo yum makecache fast
-			sudo yum -y install docker-ce
-			sudo systemctl start docker
-			sudo docker login -u croit -p beta registry.croit.io/v2
+		config.vm.provision "shell", privileged: true, inline: <<-SHELL
+			yum install -y yum-utils centos-release-ceph-jewel
+			yum install -y ceph
+			yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+			yum makecache fast
+			yum -y install docker-ce
+			systemctl start docker
+			docker login -u croit -p beta registry.croit.io/v2
 			echo "Downloading and starting Docker image (1.5 GB)."
 			echo "This will take several minutes..."
-			sudo docker run --net=host --name croit -d registry.croit.io/v2/croit:latest
+			docker run --net=host --name croit -d registry.croit.io/v2/croit:latest
+		SHELL
+		config.vm.provision "shell", privileged: true, run: "always", inline: <<-SHELL
+			systemctl start docker
+			docker login -u croit -p beta registry.croit.io/v2
+			echo "Trying to update Docker image, this might take a few minutes"
+			docker pull registry.croit.io/v2/croit:latest
+			docker start croit
 		SHELL
 	end
 
-	# 3 identical test VMs
-	(1..3).each do |i|
+	# 5 identical test VMs
+	(1..5).each do |i|
 		config.vm.define :"ceph#{i}", autostart: false do |config|
 			config.vm.box = 'c33s/empty'
 			config.vm.box_version = '=0.1.0'
@@ -52,34 +59,44 @@ Vagrant.configure("2") do |config|
 					'--intnet1', 'croit_pxe',
 					# make sure it only boots via network
 					'--boot1', 'net', '--boot2', 'none', '--boot3', 'none', '--boot4', 'none',
-					# yes, it just re-uses the same mac by default...
-					'--macaddress1', 'auto'
 				]
 				# no, we don't want an annoying prompt
 				vb.customize [ 'setextradata', :id, 'GUI/FirstRun', 'no' ]
-				# delete the cd drive
-				vb.customize [
-					'storageattach', :id,
-					'--storagectl', 'IDE',
-					'--medium', 'none',
-					'--port', 1,
-					'--device', 0
-				]
-				# delete the default (empty) disk
-				vb.customize [
-					'storageattach', :id,
-					'--storagectl', 'SATA',
-					'--medium', 'none',
-					'--port', 0,
-					'--device', 0
-				]
-				# create our disks, suggested usage:
-				# disk 1: mon (1 GB)
-				# disk 2: journal (1 GB)
-				# disk 3: osd (8 GB)
-				add_disk(vb, "./ceph#{i}-disk1.vdi", 0, 1024, 'on')
-				add_disk(vb, "./ceph#{i}-disk2.vdi", 1, 1024, 'on')
-				add_disk(vb, "./ceph#{i}-disk3.vdi", 2, 8192, 'off')
+			end
+			# running the disk commands multiple times fails
+			# and there is no way to ignore failures in vb.customize
+			unless created?("ceph#{i}")
+				config.vm.provider :virtualbox do |vb|
+					# we need to change the MAC on the first startup (but only on the first, otherwise it will be re-detected)
+					# yes, it just re-uses the same mac by default...
+					vb.customize [
+						'modifyvm', :id,
+						'--macaddress1', 'auto'
+					]
+					# delete the cd drive
+					vb.customize [
+						'storageattach', :id,
+						'--storagectl', 'IDE',
+						'--medium', 'none',
+						'--port', 1,
+						'--device', 0
+					]
+					# delete the default (empty) disk
+					vb.customize [
+						'storageattach', :id,
+						'--storagectl', 'SATA',
+						'--medium', 'none',
+						'--port', 0,
+						'--device', 0
+					]
+					# create our disks, suggested usage:
+					# disk 1: mon (1 GB)
+					# disk 2: journal (1 GB)
+					# disk 3: osd (8 GB)
+					add_disk(vb, "./ceph#{i}-disk1.vdi", 0, 1024, 'on')
+					add_disk(vb, "./ceph#{i}-disk2.vdi", 1, 1024, 'on')
+					add_disk(vb, "./ceph#{i}-disk3.vdi", 2, 8192, 'off')
+				end
 			end
 		end
 	end
@@ -101,5 +118,12 @@ def add_disk(vb, name, port, size, ssd)
 		'--port', port,
 		'--nonrotational', ssd
 	]
+end
+
+# Check if a VM was already created before
+def created?(vm_name, provider='virtualbox')
+	print "checkif if #{vm_name} is already provisioned\n"
+	print ".vagrant/machines/#{vm_name}/#{provider}/action_provision\n"
+	File.exist?(".vagrant/machines/#{vm_name}/#{provider}/id")
 end
 
