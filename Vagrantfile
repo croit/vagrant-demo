@@ -22,6 +22,8 @@ Vagrant.configure("2") do |config|
 			sudo yum -y install docker-ce
 			sudo systemctl start docker
 			sudo docker login -u croit -p beta registry.croit.io/v2
+			echo "Downloading and starting Docker image (1.5 GB)."
+			echo "This will take several minutes..."
 			sudo docker run --net=host --name croit -d registry.croit.io/v2/croit:latest
 		SHELL
 	end
