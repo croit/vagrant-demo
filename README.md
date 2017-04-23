@@ -53,15 +53,15 @@ Login as `admin` with password `admin`. The first step allows you to change your
 ### Setup management interface
 croit uses one network interface as management interface for all management communication from PXE boot to monitoring running servers.
 
-This demo setup preconfigures an interface with the IP address 192.168.0.2/24 in the croit VM, we will use this as our management interface.
-The interface should be named eth1, but the name might change.
+This demo setup preconfigures an interface with the IP address `192.168.0.2/24` in the croit VM, we will use this as our management interface.
+The interface should be named `eth1`, but the name might change.
 
 ![Management interface setup](./images/setup-step2.png)
 
 ### Setup PXE network
 
 This demo setup only features a single network that is used for management, PXE, and Ceph traffic alike.
-Create a new setup and configure it as 192.168.0.0/24 with a DHCP pool for the initial boot of new servers.
+Create a new setup and configure it as `192.168.0.0/24` with a DHCP pool for the initial boot of new servers.
 
 ![DHCP network creation](./images/setup-step3.png)
 
@@ -137,7 +137,7 @@ You can configure one of the smaller disks as journal disk to test external jour
 
 You can also click on 'Disks' below the table to get an overview of all disks on all servers in a single table
 
-![Disk overview](./images/create-osds.png)
+![Disk overview](./images/disk-overview.png)
 
 ## Add hosts to the crush map
 croit does not automatically add new hosts to the crush map to avoid data movement before a server is fully configured.
