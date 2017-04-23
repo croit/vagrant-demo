@@ -51,7 +51,9 @@ Vagrant.configure("2") do |config|
 					'--nic1', 'intnet',
 					'--intnet1', 'croit_pxe',
 					# make sure it only boots via network
-					'--boot1', 'net', '--boot2', 'none', '--boot3', 'none', '--boot4', 'none'
+					'--boot1', 'net', '--boot2', 'none', '--boot3', 'none', '--boot4', 'none',
+					# yes, it just re-uses the same mac by default...
+					'--macaddress1', 'auto'
 				]
 				# no, we don't want an annoying prompt
 				vb.customize [ 'setextradata', :id, 'GUI/FirstRun', 'no' ]
