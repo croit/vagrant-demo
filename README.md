@@ -14,7 +14,8 @@ The following requirements must be met to run this demo:
 * [Vagrant](https://www.vagrantup.com) with [VirtualBox](https://www.virtualbox.org/) installed
 * At least 8 GB RAM
 * At least 10 GB disk space, 40 GB if you want to fill up your cluster completely
-* A reasonably fast internet connection, the initial setup will download ~3 GB of images
+* A reasonably fast internet connection, the initial setup will download ~3 GB of data
+* We recommend using a recent version of Chrome or Firefox
 
 Note that PXE booting is an unusual scenario for both Vagrant and VirtualBox and may cause unexpected issues.
 We have last tested these procedures with VirtualBox 5.0.32 and Vagrant 1.9.3 on macOS and Linux.
@@ -79,6 +80,12 @@ vagrant up ceph1
 
 ![Server boot menu](./images/croit-boot.png)
 
+
+**Caution:**
+The live image is downloaded asynchronously from croit.io after the first start, the menu will instruct you to wait and retry if the download is not yet finished.
+
+
+
 The server will automatically boot our live image and it will show up in our frontend as soon as you see the boot menu.
 
 Rename the server to something reasonable like `ceph-server1` using the Edit button.
@@ -91,11 +98,6 @@ mon disks are used to store the Ceph monitor database, each server running a Cep
 This formats and mounts the disk on the server, the Save button leading to the next step becomes active once this action completes successfully.
 
 
-
-**Caution:**
-The live image is downloaded asynchronously from croit.io after the first start, the menu will instruct you to wait and retry if the download is not yet finished.
-
-
 **Caution:**
 Vagrant doesn't know about our network and login configuration, it will hence get stuck with the following message:
 
@@ -104,7 +106,7 @@ Vagrant doesn't know about our network and login configuration, it will hence ge
 Warning: Authentication failure. Retrying...
 ```
 
-It is save to cancel Vagrant with `ctrl-c` as soon as the VM is up.
+It is safe to cancel Vagrant with `ctrl-c` as soon as the VM is up.
 The VM will continue to run even though Vagrant complains.
 
 ### Create the cluster
