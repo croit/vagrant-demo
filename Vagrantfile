@@ -122,8 +122,6 @@ end
 
 # Check if a VM was already created before
 def created?(vm_name, provider='virtualbox')
-	print "checkif if #{vm_name} is already provisioned\n"
-	print ".vagrant/machines/#{vm_name}/#{provider}/action_provision\n"
 	File.exist?(".vagrant/machines/#{vm_name}/#{provider}/id")
 end
 
