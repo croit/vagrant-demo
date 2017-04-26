@@ -16,6 +16,8 @@ Vagrant.configure("2") do |config|
 			vb.cpus = '4' # makes the initial setup much faster
 		end
 		config.vm.provision "shell", privileged: true, inline: <<-SHELL
+			# this seems to be necessary sometimes
+			yum makecache
 			yum install -y yum-utils centos-release-ceph-jewel
 			yum install -y ceph
 			yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
