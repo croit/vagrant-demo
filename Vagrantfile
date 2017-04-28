@@ -5,6 +5,9 @@ Vagrant.configure("2") do |config|
 
 	config.vm.box = 'centos/7'
 	config.vm.box_version = '=1703.01'
+
+	# we don't use synced folders so disable the default to not require rsync binary on Windows
+	config.vm.synced_folder ".", "/vagrant", disabled: true
 	
 	# the croit controller VM
 	config.vm.define :croit, primary: true do |config|
