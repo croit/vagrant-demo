@@ -11,8 +11,10 @@ Vagrant.configure("2") do |config|
 	
 	# the croit controller VM
 	config.vm.define :croit, primary: true do |config|
-		config.vm.network "forwarded_port", guest: 8080, host: 8080
-		config.vm.network "forwarded_port", guest: 443, host: 8443
+		# bind to 127.0.0.1 (as opposed to 0.0.0.0) to fix Vagrant 1.9.3 on Windows 10
+		config.vm.network "forwarded_port", guest: 8080, host: 8080, host_ip: "127.0.0.1"
+		config.vm.network "forwarded_port", guest: 443, host: 8443, host_ip: "127.0.0.1"
+
 		config.vm.network "private_network", ip: "192.168.0.2", libvirt__network_name: "croit_pxe", :libvirt__dhcp_enabled => false, virtualbox__intnet: "croit_pxe"
 		config.vm.provider "virtualbox" do |vb|
 			vb.memory = '1536'
