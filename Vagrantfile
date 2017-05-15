@@ -20,7 +20,7 @@ Vagrant.configure("2") do |config|
 			vb.memory = '1536'
 			vb.cpus = '4' # makes the initial setup much faster
 		end
-		config.vm.provision "shell", privileged: true, inline: <<-SHELL
+		config.vm.provision "shell", privileged: true, inline: %Q{
 			# this seems to be necessary sometimes
 			yum makecache
 			yum install -y yum-utils centos-release-ceph-jewel
@@ -32,13 +32,14 @@ Vagrant.configure("2") do |config|
 			docker login -u croit -p beta registry.croit.io/v2
 			echo "Downloading and starting Docker image (1.5 GB)."
 			echo "This will take several minutes..."
-			docker run --net=host --name croit -d registry.croit.io/v2/croit:latest
-		SHELL
+			docker run --net=host --name croit -d registry.croit.io/v2/croit:#{ENV['CROIT_TAG'] || 'latest'}
+		}
 		config.vm.provision "shell", privileged: true, run: "always", inline: <<-SHELL
 			systemctl start docker
 			docker login -u croit -p beta registry.croit.io/v2
 			echo "Trying to update Docker image, this might take a few minutes"
-			docker pull registry.croit.io/v2/croit:latest
+			docker ps -a | grep "croit:nightly" && docker pull registry.croit.io/v2/croit:nightly
+			docker ps -a | grep "croit:latest" && docker pull registry.croit.io/v2/croit:latest
 			docker start croit
 		SHELL
 	end
