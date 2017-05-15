@@ -14,15 +14,23 @@ The following requirements must be met to run this demo:
 * [Vagrant](https://www.vagrantup.com) with [VirtualBox](https://www.virtualbox.org/) installed
 * At least 8 GB RAM
 * At least 10 GB disk space, 40 GB if you want to fill up your cluster completely
-* A reasonably fast internet connection, the initial setup will download ~3 GB of data
+* A reasonably fast Internet connection, the initial setup will download ~3 GB of data
 * We recommend using a recent version of Chrome or Firefox
 
 Note that PXE booting is an unusual scenario for both Vagrant and VirtualBox and may cause unexpected issues.
-We have last tested these procedures with VirtualBox 5.0.32 and Vagrant 1.9.3 on macOS and Linux.
+We have last tested these procedures with VirtualBox 5.1.20 and Vagrant 1.9.4 on macOS and Linux.
 
 **Caution:**
 The VirtualBox PXE stack sometimes hangs when a server reboots.
-Shut down the VM completely and restart it instead of resetting it if you encounter this problem.
+Shut down Ceph VMs completely and restart them instead of resetting them if you encounter this problem.
+
+The Vagrant plugin `vagrant-vbguest` might be required when running on Windows.
+Run the following command if you encounter problems with the local port forwarding configuration.
+
+```
+vagrant plugin install vagrant-vbguest
+```
+
 
 
 ## Installation
@@ -40,9 +48,9 @@ Don't worry if the output looks unresponsive while the Docker image (1.5 GB) is 
 croit is made available by the Vagrant environment at [http://localhost:8080](http://localhost:8080) or via https at [https://localhost:8443](http://localhost:8443) with a self-signed certificate.
 
 ### VMs in this setup
-Our Vagrant file defines three VMs: `croit` and `ceph1` to `ceph3`.
-`croit` is the main VM running the croit management engine, the three `ceph` VMs are identically configured, each featuring three disks to be used as mon, osd, and journal.
-The other VMs are started later once croit is configured.
+Our Vagrant file defines three VMs: `croit` and `ceph1` to `ceph5`.
+`croit` is the main VM running the croit management engine, the `ceph` VMs are identically configured, each featuring three disks to be used as mon, osd, and journal.
+The Ceph VMs are started later once croit is configured.
 
 ## Setting up croit
 
@@ -153,7 +161,7 @@ You can also add CRUSH buckets here to create complex hierarchies.
 ## (Optional) Adding mons
 Configure a disk as mon, then select 'Show services' to create an additional Ceph monitor service.
 
-Keep in mind that there should be a odd number of mons for optimal fault tolerance.
+Keep in mind that there should be an odd number of mons for optimal fault tolerance.
 
 ## Test the cluster with RBD
 
