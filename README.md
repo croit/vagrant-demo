@@ -45,7 +45,7 @@ vagrant up
 Note that this will take several minutes.
 Don't worry if the output looks unresponsive while the Docker image (1.5 GB) is being downloaded.
 
-croit is made available by the Vagrant environment at [http://localhost:8080](http://localhost:8080) or via https at [https://localhost:8443](http://localhost:8443) with a self-signed certificate.
+croit is made available by the Vagrant environment at [http://localhost:8080](http://localhost:8080) or via https at [https://localhost:8443](https://localhost:8443) with a self-signed certificate.
 
 ### VMs in this setup
 Our Vagrant file defines three VMs: `croit` and `ceph1` to `ceph5`.
