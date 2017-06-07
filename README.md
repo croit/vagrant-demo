@@ -1,6 +1,6 @@
 # CAUTION
-This is a beta version, there are a lot of rough edges and bugs.
-Do not use for production data.
+This is a beta version, there are some rough edges and maybe even bugs.
+Do not use for production data without our support.
 
 You can contact us at [croit.io](https://croit.io) or [info@croit.io](mailto:info@croit.io) if you encounter problems with this setup.
 
@@ -13,15 +13,15 @@ The following requirements must be met to run this demo:
 
 * [Vagrant](https://www.vagrantup.com) with [VirtualBox](https://www.virtualbox.org/) installed
 * At least 8 GB RAM
-* At least 10 GB disk space, 40 GB if you want to fill up your cluster completely
+* At least 10 GB disk space, 40 GB or more if you want to fill up your cluster
 * A reasonably fast Internet connection, the initial setup will download ~3 GB of data
 * We recommend using a recent version of Chrome or Firefox
 
 Note that PXE booting is an unusual scenario for both Vagrant and VirtualBox and may cause unexpected issues.
-We have last tested these procedures with VirtualBox 5.1.20 and Vagrant 1.9.4 on macOS and Linux.
+We have last tested these procedures with VirtualBox 5.0 and 5.1 and Vagrant 1.9.4 on macOS and Linux.
 
 **Caution:**
-The VirtualBox PXE stack sometimes hangs when a server reboots.
+The VirtualBox PXE stack sometimes hangs when a server reboots when running on macOS.
 Shut down Ceph VMs completely and restart them instead of resetting them if you encounter this problem.
 
 The Vagrant plugin `vagrant-vbguest` might be required when running on Windows.
@@ -48,13 +48,14 @@ Don't worry if the output looks unresponsive while the Docker image (1.5 GB) is 
 croit is made available by the Vagrant environment at [http://localhost:8080](http://localhost:8080) or via https at [https://localhost:8443](http://localhost:8443) with a self-signed certificate.
 
 ### VMs in this setup
-Our Vagrant file defines three VMs: `croit` and `ceph1` to `ceph5`.
+Our Vagrant file defines several VMs: `croit` and `ceph1` to `ceph5`.
 `croit` is the main VM running the croit management engine, the `ceph` VMs are identically configured, each featuring three disks to be used as mon, osd, and journal.
 The Ceph VMs are started later once croit is configured.
 
 ## Setting up croit
 
 croit will guide you through the initial setup of your Ceph cluster.
+The main control panel is located at the bottom of the screen and shows the progress through the setup and action buttons.
 
 ### Login
 Login as `admin` with password `admin`. The first step allows you to change your password to something more secure.
@@ -99,7 +100,7 @@ The server will automatically boot our live image and it will show up in our fro
 Rename the server to something reasonable like `ceph-server1` using the Edit button.
 Disks and NICs will show up a few seconds after the server finishes booting.
 Configure one of the 1 GB disks as Ceph mon.
-mon disks are used to store the Ceph monitor database, each server running a Ceph monitor service needs one disk configured as mon disk.
+Mon disks are used to store the Ceph monitor database, each server running a Ceph monitor service needs one disk configured as mon disk.
 
 ![Configure a disk as mon disk](./images/setup-step4.png)
 
@@ -114,7 +115,7 @@ Vagrant doesn't know about our network and login configuration, it will hence ge
 Warning: Authentication failure. Retrying...
 ```
 
-It is safe to cancel Vagrant with `ctrl-c` as soon as the VM is up.
+It is safe to cancel Vagrant with `ctrl-c` as soon as you see this message.
 The VM will continue to run even though Vagrant complains.
 
 ### Create the cluster
@@ -140,12 +141,9 @@ vagrant up ceph3
 
 The servers will show up in the 'Hardware' tab where they can be renamed with the 'Edit' action.
 
-Create OSDs on all three servers by selecting 'Show Disks' followed by 'Set to OSD' on the largest disk.
+Create OSDs on all three servers.
+The 'All Disks' button shows a convenient overview of all disks in all servers.
 You can configure one of the smaller disks as journal disk to test external journal partitions.
-
-![Create OSDs](./images/create-osds.png)
-
-You can also click on 'Disks' below the table to get an overview of all disks on all servers in a single table
 
 ![Disk overview](./images/disk-overview.png)
 
@@ -165,7 +163,7 @@ Keep in mind that there should be an odd number of mons for optimal fault tolera
 
 ## Test the cluster with RBD
 
-Your cluster is now ready to be used. The health should show up as "Ok" in the status view.
+Your cluster is now ready to be used. The health should show up as "Ok" in the status view after a few seconds.
 Let's test it by mounting and using a disk image.
 
 ### Creating an RBD image
@@ -223,5 +221,9 @@ You can use the statistics tab to observe IO and drill down to detailed performa
 All of this data is stored in graphite.
 This allows you feed this data into your existing monitoring systems such as icinga2 or Grafana.
 
-## Test the cluster with S3
-Description coming soon.
+## Test the cluster with other protocols
+Other things to try:
+
+* CephFS by adding a metadata server
+* Our highly available NFS server that makes CephFS available to legacy clients
+* RadosGW instances to try out the S3 API
