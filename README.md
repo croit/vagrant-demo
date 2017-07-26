@@ -11,7 +11,7 @@ The easiest way to try out croit is by using our Vagrant demo setup.
 ## Requirements
 The following requirements must be met to run this demo:
 
-* [Vagrant](https://www.vagrantup.com) with [VirtualBox](https://www.virtualbox.org/) installed
+* [Vagrant](https://www.vagrantup.com) with [VirtualBox](https://www.virtualbox.org/) 5.1 installed
 * At least 8 GB RAM
 * At least 10 GB disk space, 40 GB or more if you want to fill up your cluster
 * A reasonably fast Internet connection, the initial setup will download ~3 GB of data
