@@ -2,7 +2,6 @@
 # vi: set ft=ruby :
 
 Vagrant.configure("2") do |config|
-
 	config.vm.box = 'centos/7'
 	config.vm.box_version = '=1703.01'
 
@@ -47,6 +46,7 @@ Vagrant.configure("2") do |config|
 	# 5 identical test VMs
 	(1..5).each do |i|
 		config.vm.define :"ceph#{i}", autostart: false do |config|
+			config.vm.boot_timeout = 10
 			config.vm.box = 'c33s/empty'
 			config.vm.box_version = '=0.1.0'
 			config.vm.provider :virtualbox do |vb|
@@ -82,6 +82,15 @@ Vagrant.configure("2") do |config|
 						'modifyvm', :id,
 						'--macaddress1', 'auto'
 					]
+					# NVMe setup
+					vb.customize [
+						'storagectl', :id,
+						'--name', 'NVMe',
+						'--add', 'pcie',
+						'--portcount', 1,
+						'--hostiocache', 'on',
+						'--bootable', 'off'
+					]
 					# delete the cd drive
 					vb.customize [
 						'storageattach', :id,
@@ -100,11 +109,13 @@ Vagrant.configure("2") do |config|
 					]
 					# create our disks, suggested usage:
 					# disk 1: mon (1 GB)
-					# disk 2: journal (1 GB)
-					# disk 3: osd (8 GB)
+					# disk 2: osd (4 GB)
+					# disk 3: osd (4 GB)
 					add_disk(vb, "./ceph#{i}-disk1.vdi", 0, 1024, 'on')
-					add_disk(vb, "./ceph#{i}-disk2.vdi", 1, 1024, 'on')
-					add_disk(vb, "./ceph#{i}-disk3.vdi", 2, 8192, 'off')
+					add_disk(vb, "./ceph#{i}-disk2.vdi", 1, 4096, 'off')
+					add_disk(vb, "./ceph#{i}-disk3.vdi", 2, 4096, 'off')
+					# disk 4: NVMe journal (1 GB)
+					add_nvme_disk(vb, "./ceph#{i}-disk4.vdi", 0, 1024)
 				end
 			end
 		end
@@ -126,6 +137,23 @@ def add_disk(vb, name, port, size, ssd)
 		'--medium', name,
 		'--port', port,
 		'--nonrotational', ssd
+	]
+end
+
+def add_nvme_disk(vb, name, port, size)
+	unless File.exist?(name)
+		vb.customize [
+			'createmedium', 'disk',
+			'--filename', name,
+			'--size', size
+		]
+	end
+	vb.customize [
+		'storageattach', :id,
+		'--storagectl', 'NVMe',
+		'--type', 'hdd',
+		'--medium', name,
+		'--port', port
 	]
 end
 
