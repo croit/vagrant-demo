@@ -29,18 +29,17 @@ Vagrant.configure("2") do |config|
 			yum makecache fast
 			yum -y install docker-ce
 			systemctl start docker
-			docker login -u croit -p beta registry.croit.io/v2
 			echo "Downloading and starting Docker image (1.5 GB)."
 			echo "This will take several minutes..."
-			docker run --net=host --name croit -d croit/croit:#{ENV['CROIT_TAG'] || 'latest'}
+			docker create --name croit-data croit/croit:latest
+			docker run --net=host --volumes-from croit-data --name croit --restart=always -d croit/croit:#{ENV['CROIT_TAG'] || 'latest'}
 		}
 		config.vm.provision "shell", privileged: true, run: "always", inline: <<-SHELL
 			systemctl start docker
-			docker login -u croit -p beta registry.croit.io/v2
 			echo "Trying to update Docker image, this might take a few minutes"
-			docker ps -a | grep "croit:nightly" && docker pull croit/croit:nightly
-			docker ps -a | grep "croit:latest" && docker pull croit/croit:latest
-			docker start croit
+			docker stop croit
+			docker ps -a | grep "croit:nightly" && (docker pull croit/croit:nightly; docker rm -f croit; docker run --net=host --volumes-from croit-data --name croit --restart=always -d croit/croit:latest)
+			docker ps -a | grep "croit:latest" && (docker pull croit/croit:latest; docker rm -f croit; docker run --net=host --volumes-from croit-data --name croit --restart=always -d croit/croit:latest)
 		SHELL
 	end
 
