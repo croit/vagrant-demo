@@ -1,8 +1,8 @@
 # CAUTION
-This is a beta version, there are some rough edges and maybe even bugs.
-Do not use for production data without our support.
+This is a demo setup and not meant for production, check out our [guide for production setups](https://croit.io/production/) 
+You can contact us at [croit.io](https://croit.io) or [info@croit.io](mailto:info@croit.io) if you encounter problems with this setup or need help getting it to production.
 
-You can contact us at [croit.io](https://croit.io) or [info@croit.io](mailto:info@croit.io) if you encounter problems with this setup.
+Be careful with deployments on laptops. Sleep mode of the laptop or pausing VMs can mess with clocks beyond repair. `vagrant ssh` followed by `sudo ntpdate` followed by a restart of affected VMs can help.
 
 # Croit demo setup with Vagrant
 
@@ -11,7 +11,7 @@ The easiest way to try out croit is by using our Vagrant demo setup.
 ## Requirements
 The following requirements must be met to run this demo:
 
-* [Vagrant](https://www.vagrantup.com) at least 1.9.4 or newer 
+* [Vagrant](https://www.vagrantup.com) 1.9.4 or newer 
 * [VirtualBox](https://www.virtualbox.org/) 5.1.26 or newer
 * At least 8 GB RAM
 * At least 10 GB disk space, 40 GB or more if you want to fill up your cluster
@@ -19,10 +19,10 @@ The following requirements must be met to run this demo:
 * We recommend using a recent version of Chrome or Firefox
 
 Note that PXE booting is an unusual scenario for both Vagrant and VirtualBox and may cause unexpected issues.
-We have last tested these procedures with VirtualBox 5.0 and 5.1 and Vagrant 1.9.4 on macOS and Linux.
+We have last tested these procedures with VirtualBox 5.0 and 5.1 and Vagrant 1.9.4 and 2.0.0 on macOS and Linux.
 
 **Caution:**
-The VirtualBox PXE stack sometimes hangs when a server reboots when running on macOS.
+The VirtualBox PXE stack sometimes hangs when a server reboots when running on macOS on some versions of VirtualBox.
 Shut down Ceph VMs completely and restart them instead of resetting them if you encounter this problem.
 
 The Vagrant plugin `vagrant-vbguest` might be required when running on Windows.
@@ -50,7 +50,7 @@ croit is made available by the Vagrant environment at [http://localhost:8080](ht
 
 ### VMs in this setup
 Our Vagrant file defines several VMs: `croit` and `ceph1` to `ceph5`.
-`croit` is the main VM running the croit management engine, the `ceph` VMs are identically configured, each featuring three disks to be used as mon, osd, and journal.
+`croit` is the main VM running the croit management engine, the `ceph` VMs are all configured identically, each featuring three disks to be used as mon, osd, and journal.
 The Ceph VMs are started later once croit is configured.
 
 ## Setting up croit
@@ -161,6 +161,9 @@ You can also add CRUSH buckets here to create complex hierarchies.
 Configure a disk as mon, then select 'Show services' to create an additional Ceph monitor service.
 
 Keep in mind that there should be an odd number of mons for optimal fault tolerance.
+
+**Caution: ** New installations with Luminous sometimes run into a Ceph bug when initially adding mons that leads to all mons except the first one restarting very often. We are currently investigating the cause for this.
+A simultaneous restart of all mon and mgr sevices fixes it and the issue only occurs once per installation (if it occurs).
 
 ## Test the cluster with RBD
 
