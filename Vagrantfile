@@ -98,12 +98,12 @@ Vagrant.configure("2") do |config|
 						'--device', 0
 					]
 					# create our disks, suggested usage:
-					# disk 1: mon (1 GB)
-					# disk 2: journal (1 GB)
-					# disk 3: osd (8 GB)
-					add_disk(vb, "./ceph#{i}-disk1.vdi", 0, 1024, 'on')
-					add_disk(vb, "./ceph#{i}-disk2.vdi", 1, 1024, 'on')
-					add_disk(vb, "./ceph#{i}-disk3.vdi", 2, 8192, 'off')
+					# disk 1: mon (2 GB)
+					# disk 2: osd (10 GB)
+					# disk 3: osd (10 GB)
+					add_disk(vb, "./ceph#{i}-disk1.vdi", 0, 2048, 'on')
+					add_disk(vb, "./ceph#{i}-disk2.vdi", 1, 10240, 'on')
+					add_disk(vb, "./ceph#{i}-disk3.vdi", 2, 10240, 'off')
 				end
 			end
 		end
