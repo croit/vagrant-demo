@@ -3,8 +3,8 @@
 
 Vagrant.configure("2") do |config|
 
-	config.vm.box = 'centos/7'
-	config.vm.box_version = '=1703.01'
+	config.vm.box = 'debian/stretch64'
+	config.vm.box_version = '=9.7.0'
 
 	# we don't use synced folders so disable the default to not require rsync binary on Windows
 	config.vm.synced_folder ".", "/vagrant", disabled: true
@@ -21,14 +21,13 @@ Vagrant.configure("2") do |config|
 			vb.cpus = '4' # makes the initial setup much faster
 		end
 		config.vm.provision "shell", privileged: true, inline: %Q{
-			# this seems to be necessary sometimes
-			yum makecache
-			yum install -y yum-utils centos-release-ceph-jewel
-			yum install -y ceph
-			yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-			yum makecache fast
-			yum -y install docker-ce
-			systemctl start docker
+			apt -y update
+			apt -y remove docker docker-engine docker.io containerd runc
+			apt -y install apt-transport-https ca-certificates curl gnupg2 software-properties-common
+			curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -
+			add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable"
+			apt -y update
+			apt -y install docker-ce docker-ce-cli containerd.io 
 			echo "Downloading and starting Docker image (1.5 GB)."
 			echo "This will take several minutes..."
 			docker create --name croit-data croit/croit:latest
