@@ -4,7 +4,7 @@
 Vagrant.configure("2") do |config|
 
 	config.vm.box = 'debian/stretch64'
-	config.vm.box_version = '=9.7.0'
+	config.vm.box_version = '=9.9.0'
 
 	# we don't use synced folders so disable the default to not require rsync binary on Windows
 	config.vm.synced_folder ".", "/vagrant", disabled: true
