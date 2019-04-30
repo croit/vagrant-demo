@@ -45,8 +45,8 @@ Vagrant.configure("2") do |config|
 	# 5 identical test VMs
 	(1..5).each do |i|
 		config.vm.define :"ceph#{i}", autostart: false do |config|
-			config.vm.box = 'c33s/empty'
-			config.vm.box_version = '=0.1.0'
+			config.vm.box = 'q2p/empty'
+			config.vm.box_version = '=0.0.1'
 			config.vm.provider :virtualbox do |vb|
 				vb.gui = 'true'
 				vb.memory = '2048'
