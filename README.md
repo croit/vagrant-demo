@@ -43,6 +43,8 @@ cd croit-vagrant
 vagrant up
 ```
 
+You can select a specific croit version by setting the environment variable `CROIT_TAG` (for example `v1901` or `nightly`) before `vagrant up`.
+
 Note that this will take several minutes.
 Don't worry if the output looks unresponsive while the Docker image (1.5 GB) is being downloaded.
 
@@ -52,6 +54,13 @@ croit is made available by the Vagrant environment at [http://localhost:8080](ht
 Our Vagrant file defines several VMs: `croit` and `ceph1` to `ceph5`.
 `croit` is the main VM running the croit management engine, the `ceph` VMs are all configured identically, each featuring three disks to be used as mon, osd, and journal.
 The Ceph VMs are started later once croit is configured.
+
+Note: The `croit` VM also contains a docker container with our management node. This is where Ceph is installed, so if you want to access Ceph:
+
+```bash
+vagrant ssh croit
+sudo docker exec -it croit bash
+```
 
 ## Setting up croit
 
@@ -172,7 +181,7 @@ Let's test it by mounting and using a disk image.
 
 ### Creating an RBD image
 
-You can create an RBD image from the 'Pools' tab, select 'Show RBDs' on the default rbd pool. Create an RBD image with KRBD compatibility enabled, this allows us to mount and use the image directly from Linux.
+You can create an RBD image from the 'Pools' view. Click 'Create Pool' and select application 'RBD', then click 'Show RBDs' on the newly created pool. Create an RBD image with KRBD compatibility enabled, this allows us to mount and use the image directly from Linux.
 
 ![Create an RBD image](./images/create-rbd.png)
 
@@ -180,7 +189,7 @@ You can create an RBD image from the 'Pools' tab, select 'Show RBDs' on the defa
 
 We will use the croit mangement VM as test client for simplicity here.
 
-The 'Keys' tab allows downloading Ceph keyrings and a slimmed-down `ceph.conf` for Ceph clients. Use the `client.admin` keyring.
+The 'Keys' view (Settings -> Keys) allows downloading Ceph keyrings and a slimmed-down `ceph.conf` for Ceph clients. Use the `client.admin` keyring.
 
 All downloads offered by croit can either be downloaded directly or as a copy-pastable link that is valid for 30 minutes.
 
