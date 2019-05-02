@@ -4,7 +4,7 @@
 Vagrant.configure("2") do |config|
 
 	config.vm.box = 'debian/stretch64'
-	config.vm.box_version = '=9.9.0'
+	config.vm.box_version = '>=9.9.0'
 
 	# we don't use synced folders so disable the default to not require rsync binary on Windows
 	config.vm.synced_folder ".", "/vagrant", disabled: true
@@ -13,6 +13,7 @@ Vagrant.configure("2") do |config|
 	config.vm.define :croit, primary: true do |config|
 		# bind to 127.0.0.1 (as opposed to 0.0.0.0) to fix Vagrant 1.9.3 on Windows 10
 		config.vm.network "forwarded_port", guest: 8080, host: 8080, host_ip: "127.0.0.1"
+		config.vm.network "forwarded_port", guest: 8088, host: 8088, host_ip: "127.0.0.1"
 		config.vm.network "forwarded_port", guest: 443, host: 8443, host_ip: "127.0.0.1"
 
 		config.vm.network "private_network", ip: "192.168.0.2", libvirt__network_name: "croit_pxe", :libvirt__dhcp_enabled => false, virtualbox__intnet: "croit_pxe"
@@ -21,6 +22,7 @@ Vagrant.configure("2") do |config|
 			vb.cpus = '4' # makes the initial setup much faster
 		end
 		config.vm.provision "shell", privileged: true, inline: %Q{
+			sed -i "s/deb.debian.org/ftp.debian.org/g" /etc/apt/sources.list
 			apt -y update
 			apt -y remove docker docker-engine docker.io containerd runc
 			apt -y install apt-transport-https ca-certificates curl gnupg2 software-properties-common
@@ -47,6 +49,7 @@ Vagrant.configure("2") do |config|
 		config.vm.define :"ceph#{i}", autostart: false do |config|
 			config.vm.box = 'q2p/empty'
 			config.vm.box_version = '=0.0.1'
+			config.vm.boot_timeout = 10
 			config.vm.provider :virtualbox do |vb|
 				vb.gui = 'true'
 				vb.memory = '2048'
