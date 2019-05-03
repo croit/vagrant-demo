@@ -16,6 +16,10 @@ Vagrant.configure("2") do |config|
 		config.vm.network "forwarded_port", guest: 8088, host: 8088, host_ip: "127.0.0.1"
 		config.vm.network "forwarded_port", guest: 443, host: 8443, host_ip: "127.0.0.1"
 		config.vm.network "forwarded_port", guest: 8443, host: 8444, host_ip: "127.0.0.1"
+		# Port 19531 for SystemD-JournalD-remote
+		config.vm.network "forwarded_port", guest: 19531, host: 19531, host_ip: "127.0.0.1"
+		# Port 23648 for graphite-go stats
+		config.vm.network "forwarded_port", guest: 23648, host: 23648, host_ip: "127.0.0.1"
 
 		config.vm.network "private_network", ip: "192.168.0.2", libvirt__network_name: "croit_pxe", :libvirt__dhcp_enabled => false, virtualbox__intnet: "croit_pxe"
 		config.vm.provider "virtualbox" do |vb|
