@@ -15,6 +15,7 @@ Vagrant.configure("2") do |config|
 		config.vm.network "forwarded_port", guest: 8080, host: 8080, host_ip: "127.0.0.1"
 		config.vm.network "forwarded_port", guest: 8088, host: 8088, host_ip: "127.0.0.1"
 		config.vm.network "forwarded_port", guest: 443, host: 8443, host_ip: "127.0.0.1"
+		config.vm.network "forwarded_port", guest: 8443, host: 8444, host_ip: "127.0.0.1"
 
 		config.vm.network "private_network", ip: "192.168.0.2", libvirt__network_name: "croit_pxe", :libvirt__dhcp_enabled => false, virtualbox__intnet: "croit_pxe"
 		config.vm.provider "virtualbox" do |vb|
@@ -22,6 +23,11 @@ Vagrant.configure("2") do |config|
 			vb.cpus = '4' # makes the initial setup much faster
 		end
 		config.vm.provision "shell", privileged: true, inline: %Q{
+			echo > /etc/motd
+			echo "Usage:" >> /etc/motd
+			echo "$ sudo su				- to switch to the root user of this VM" >> /etc/motd
+			echo "$ sudo docker exec -it croit bash 	- to login into our management container" >> /etc/motd
+			echo  >> /etc/motd
 			sed -i "s/deb.debian.org/ftp.debian.org/g" /etc/apt/sources.list
 			apt -y update
 			apt -y remove docker docker-engine docker.io containerd runc
